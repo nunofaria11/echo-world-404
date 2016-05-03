@@ -1,0 +1,25 @@
+{
+  "name": "echo-world-404",
+  "version": "1.0.0",
+  "description": "Echo world server for facebook conversation bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "facobook",
+    "conversation",
+    "bot",
+    "node",
+    "express",
+    "heroku"
+  ],
+  "author": "nfaria",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4"
+  },
+  "engines": {
+    "node": "4.1.1"
+  }
+}
