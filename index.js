@@ -1,9 +1,10 @@
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var request = require('request');
 var app = express();
 
 const PORT = process.env.PORT || 9001;
-const FB_WEB_HOOK = "EAAX8hklBtXYBAP4Qj96PXpZCR0kQQ8oIZBy9Duc8W0NCiomLoLgqlTOAv6O4nNeZAGNxxgZCbHLlyebANm8dBUEW8k6mGNDcvcVueWo1RJMpsv6ygT2HrXPancbXLjpbAoiRs7Gq04hLxxQZBF6QLUJTNa8ZC9ZCe2rJIJvETz4bwZDZD";
+const FB_TOKEN = "EAAX8hklBtXYBAP4Qj96PXpZCR0kQQ8oIZBy9Duc8W0NCiomLoLgqlTOAv6O4nNeZAGNxxgZCbHLlyebANm8dBUEW8k6mGNDcvcVueWo1RJMpsv6ygT2HrXPancbXLjpbAoiRs7Gq04hLxxQZBF6QLUJTNa8ZC9ZCe2rJIJvETz4bwZDZD";
 
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -15,7 +16,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/webhook/', function (req, res) {
-    if (req.query['hub.verify_token'] === FB_WEB_HOOK) {
+    if (req.query['hub.verify_token'] === FB_TOKEN) {
         res.send(req.query['hub.challenge']);
     }
     res.send('Error, wrong validation token');
@@ -31,6 +32,7 @@ app.post('/webhook/', function (req, res) {
             text = event.message.text;
             // Handle a text message from this sender
             console.log('Received message:', text);
+            sendMessage(sender, "Echoing: " + text);
         }
     }
     res.sendStatus(200);
@@ -40,3 +42,32 @@ app.post('/webhook/', function (req, res) {
 app.listen(app.get('port'), function () {
     console.log('Example app listening on port 3000!');
 });
+
+//
+//
+// Logic
+
+var url = 'https://graph.facebook.com/v2.6/me/messages';
+
+function sendMessage(sender, text) {
+    var errHandler = function (err, res, body) {
+        if (err) {
+            console.log('err sending message', err);
+        } else if (res.body.error) {
+            console.log('err', err);
+
+        }
+    };
+    request(
+        {
+            url: url,
+            qs: {access_token: FB_TOKEN},
+            method: 'POST',
+            json: {
+                recipient: {id: sender},
+                message: {text: text}
+            }
+        },
+        errHandler
+    );
+}
