@@ -1,9 +1,15 @@
 var express = require('express');
+var bodyParser = require('body-parser')
 var app = express();
 
 const PORT = process.env.PORT || 9001;
 const FB_WEB_HOOK = "EAAX8hklBtXYBAP4Qj96PXpZCR0kQQ8oIZBy9Duc8W0NCiomLoLgqlTOAv6O4nNeZAGNxxgZCbHLlyebANm8dBUEW8k6mGNDcvcVueWo1RJMpsv6ygT2HrXPancbXLjpbAoiRs7Gq04hLxxQZBF6QLUJTNa8ZC9ZCe2rJIJvETz4bwZDZD";
 
+
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+app.set('port', PORT);
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
@@ -31,6 +37,6 @@ app.post('/webhook/', function (req, res) {
 });
 
 
-app.listen(PORT, function () {
+app.listen(app.get('port'), function () {
     console.log('Example app listening on port 3000!');
 });
