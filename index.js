@@ -28,6 +28,11 @@ app.post('/webhook/', function (req, res) {
     for (i = 0; i < messaging_events.length; i++) {
         event = req.body.entry[0].messaging[i];
         sender = event.sender.id;
+        if(event.postback) {
+            text = JSON.stringify(event.postback);
+            sendMessage(sender, 'Postback received:' + text);
+            continue;
+        }
         if (event.message && event.message.text) {
             text = event.message.text;
             console.log('Received message:', text);
@@ -91,7 +96,7 @@ function sendGenericMessage(sender) {
                     }, {
                         "type": "postback",
                         "title": "Postback",
-                        "payload": "Payload for first element in a generic bubble",
+                        "payload": "Payload for first element in a generic bubble"
                     }]
                 }, {
                     "title": "Second card",
@@ -100,7 +105,7 @@ function sendGenericMessage(sender) {
                     "buttons": [{
                         "type": "postback",
                         "title": "Postback",
-                        "payload": "Payload for second element in a generic bubble",
+                        "payload": "Payload for second element in a generic bubble"
                     }]
                 }]
             }
