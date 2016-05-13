@@ -30,9 +30,13 @@ app.post('/webhook/', function (req, res) {
         sender = event.sender.id;
         if (event.message && event.message.text) {
             text = event.message.text;
-            // Handle a text message from this sender
             console.log('Received message:', text);
-            sendMessage(sender, "Echoing: " + text);
+            if (text === 'Generic') {
+                sendGenericMessage(sender);
+            } else {
+                // Handle a text message from this sender
+                sendMessage(sender, "Echoing: " + text);
+            }
         }
     }
     res.sendStatus(200);
@@ -48,16 +52,14 @@ app.listen(app.get('port'), function () {
 // Logic
 
 var url = 'https://graph.facebook.com/v2.6/me/messages';
-
+function errHandler(err, res, body) {
+    if (err) {
+        console.log('err sending message', err);
+    } else if (res.body.error) {
+        console.log('err', err);
+    }
+}
 function sendMessage(sender, text) {
-    var errHandler = function (err, res, body) {
-        if (err) {
-            console.log('err sending message', err);
-        } else if (res.body.error) {
-            console.log('err', err);
-
-        }
-    };
     request(
         {
             url: url,
@@ -70,4 +72,47 @@ function sendMessage(sender, text) {
         },
         errHandler
     );
+}
+
+function sendGenericMessage(sender) {
+    var messageData = {
+        "attachment": {
+            "type": "template",
+            "payload": {
+                "template_type": "generic",
+                "elements": [{
+                    "title": "First card",
+                    "subtitle": "Element #1 of an hscroll",
+                    "image_url": "http://messengerdemo.parseapp.com/img/rift.png",
+                    "buttons": [{
+                        "type": "web_url",
+                        "url": "https://www.messenger.com/",
+                        "title": "Web url"
+                    }, {
+                        "type": "postback",
+                        "title": "Postback",
+                        "payload": "Payload for first element in a generic bubble",
+                    }]
+                }, {
+                    "title": "Second card",
+                    "subtitle": "Element #2 of an hscroll",
+                    "image_url": "http://messengerdemo.parseapp.com/img/gearvr.png",
+                    "buttons": [{
+                        "type": "postback",
+                        "title": "Postback",
+                        "payload": "Payload for second element in a generic bubble",
+                    }]
+                }]
+            }
+        }
+    };
+    request({
+        url: url,
+        qs: {access_token: FB_TOKEN},
+        method: 'POST',
+        json: {
+            recipient: {id: sender},
+            message: messageData
+        }
+    }, errHandler);
 }
