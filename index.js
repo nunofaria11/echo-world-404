@@ -48,6 +48,11 @@ app.post('/webhook/', function (req, res) {
     res.sendStatus(200);
 });
 
+app.post('/ifttt/home-wifi', function (req, res) {
+    console.log('body:', req.body);
+    res.sendStatus(200);
+});
+
 
 app.listen(app.get('port'), function () {
     console.log('Example app listening on port 3000!');
