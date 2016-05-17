@@ -57,7 +57,16 @@ app.post('/webhook/', function(req, res) {
 
 app.post('/ifttt/home-wifi', function(req, res) {
     console.log('body:', req.body);
-    var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
+    //var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
+    var m = "Welcome home!";
+    sendMessage(userIds.nuno.id, m);
+    res.sendStatus(200);
+});
+
+app.post('/ifttt/work-wifi', function(req, res) {
+    console.log('body:', req.body);
+    //var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
+    var m = "Have a nice one!";
     sendMessage(userIds.nuno.id, m);
     res.sendStatus(200);
 });
