@@ -1,4 +1,3 @@
-Current goal: echo FB messages
-
-TODO: 
-- conversation bot
+# Facebook bot: echo message
+- echo messages
+- IFTTT Maker integration (home and work wifi)
