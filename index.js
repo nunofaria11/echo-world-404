@@ -5,31 +5,38 @@ var app = express();
 
 const PORT = process.env.PORT || 9001;
 const FB_TOKEN = "EAAX8hklBtXYBAP4Qj96PXpZCR0kQQ8oIZBy9Duc8W0NCiomLoLgqlTOAv6O4nNeZAGNxxgZCbHLlyebANm8dBUEW8k6mGNDcvcVueWo1RJMpsv6ygT2HrXPancbXLjpbAoiRs7Gq04hLxxQZBF6QLUJTNa8ZC9ZCe2rJIJvETz4bwZDZD";
+const userIds = {
+    nuno: {
+        id: 10206469184389272,
+        name: 'Nuno'
+    }
+};
 
-
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(bodyParser.json());
 
 app.set('port', PORT);
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
     res.send('Hello World!');
 });
 
-app.get('/webhook/', function (req, res) {
+app.get('/webhook/', function(req, res) {
     if (req.query['hub.verify_token'] === FB_TOKEN) {
         res.send(req.query['hub.challenge']);
     }
     res.send('Error, wrong validation token');
 });
 
-app.post('/webhook/', function (req, res) {
+app.post('/webhook/', function(req, res) {
     var messaging_events, i, event, sender, text;
     messaging_events = req.body.entry[0].messaging;
     for (i = 0; i < messaging_events.length; i++) {
         event = req.body.entry[0].messaging[i];
         sender = event.sender.id;
         console.log('Sender:', event.sender);
-        if(event.postback) {
+        if (event.postback) {
             text = JSON.stringify(event.postback);
             sendMessage(sender, 'Postback received:' + text);
             continue;
@@ -48,13 +55,20 @@ app.post('/webhook/', function (req, res) {
     res.sendStatus(200);
 });
 
-app.post('/ifttt/home-wifi', function (req, res) {
+app.post('/ifttt/home-wifi', function(req, res) {
     console.log('body:', req.body);
+    var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
+    sendMessage(userIds.nuno.id, m);
     res.sendStatus(200);
 });
 
+app.get('/fb/test', function(req, res) {
+    var m = 'test';
+    sendMessage(userIds.nuno.id, m);
+    res.sendStatus(200);
+});
 
-app.listen(app.get('port'), function () {
+app.listen(app.get('port'), function() {
     console.log('Example app listening on port 3000!');
 });
 
@@ -63,6 +77,7 @@ app.listen(app.get('port'), function () {
 // Logic
 
 var url = 'https://graph.facebook.com/v2.6/me/messages';
+
 function errHandler(err, res, body) {
     if (err) {
         console.log('err sending message', err);
@@ -70,15 +85,21 @@ function errHandler(err, res, body) {
         console.log('err', err);
     }
 }
-function sendMessage(sender, text) {
-    request(
-        {
+
+function sendMessage(userId, text) {
+    request({
             url: url,
-            qs: {access_token: FB_TOKEN},
+            qs: {
+                access_token: FB_TOKEN
+            },
             method: 'POST',
             json: {
-                recipient: {id: sender},
-                message: {text: text}
+                recipient: {
+                    id: userId
+                },
+                message: {
+                    text: text
+                }
             }
         },
         errHandler
@@ -119,10 +140,14 @@ function sendGenericMessage(sender) {
     };
     request({
         url: url,
-        qs: {access_token: FB_TOKEN},
+        qs: {
+            access_token: FB_TOKEN
+        },
         method: 'POST',
         json: {
-            recipient: {id: sender},
+            recipient: {
+                id: sender
+            },
             message: messageData
         }
     }, errHandler);
