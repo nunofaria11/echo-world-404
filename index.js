@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
+var firebase = require('firebase');
 var app = express();
 
 const PORT = process.env.PORT || 9001;
@@ -11,6 +12,22 @@ const userIds = {
         name: 'Nuno'
     }
 };
+
+//
+//
+// Firebase
+
+firebase.initializeApp({
+    serviceAccount: "echo-world-404-64c374938a2f.json",
+    databaseURL: "https://echo-world-404.firebaseio.com"
+});
+
+var db = firebase.database();
+var connectsRef = db.ref('connects');
+
+//
+//
+// Server logic
 
 app.use(bodyParser.urlencoded({
     extended: false
@@ -55,25 +72,58 @@ app.post('/webhook/', function(req, res) {
     res.sendStatus(200);
 });
 
+function newFirebaseModel(wifi) {
+    var model = {};
+    var id = wifi.ssid + '-' + Date.now();
+    model[id] = wifi;
+    return model;
+}
+
 app.post('/ifttt/home-wifi', function(req, res) {
-    console.log('body:', req.body);
-    //var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
-    var m = "Welcome home!";
-    sendMessage(userIds.nuno.id, m);
+    var obj = newFirebaseModel(req.body);
+    connectsRef.set(obj, function(err) {
+        if (err) {
+            console.error('Firebase error:', err || '?');
+            res.status(500).send('Firebase error:' + (err || '?'));
+            return;
+        }
+        console.log('body:', req.body);
+        var m = "Welcome home!";
+        sendMessage(userIds.nuno.id, m);
+    });
     res.sendStatus(200);
 });
 
 app.post('/ifttt/work-wifi', function(req, res) {
-    console.log('body:', req.body);
-    //var m = userIds.nuno.name + ' connected ' + req.body.ssid + ' (' + req.body.time + ')';
-    var m = "Have a nice one!";
-    sendMessage(userIds.nuno.id, m);
+    var obj = newFirebaseModel(req.body);
+    connectsRef.set(obj, function(err) {
+        if (err) {
+            console.error('Firebase error:', err || '?');
+            res.status(500).send('Firebase error:' + (err || '?'));
+            return;
+        }
+        console.log('body:', req.body);
+        var m = "Have a nice one!";
+        sendMessage(userIds.nuno.id, m);
+    });
     res.sendStatus(200);
 });
 
 app.get('/fb/test', function(req, res) {
-    var m = 'test';
-    sendMessage(userIds.nuno.id, m);
+    var obj = {
+        ssid: 'test',
+        time: new Date().toString()
+    };
+    console.log('test:', obj);
+    connectsRef.push().set(obj, function(err) {
+        if (err) {
+            console.error('Firebase error:', err || '?');
+            res.status(500).send('Firebase error:' + (err || '?'));
+            return;
+        }
+        var m = 'test';
+        //sendMessage(userIds.nuno.id, m);    
+    });
     res.sendStatus(200);
 });
 

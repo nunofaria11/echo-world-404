@@ -3,4 +3,4 @@
 - IFTTT Maker integration (home and work wifi)
 
 ## TODO
-Cool stuff
+- Firebase
