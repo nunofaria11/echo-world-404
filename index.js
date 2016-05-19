@@ -87,10 +87,11 @@ app.post('/ifttt/home-wifi', function(req, res) {
             res.status(500).send('Firebase error:' + (err || '?'));
             return;
         }
-        console.log('body:', req.body);
-        var m = "Welcome home!";
-        sendMessage(userIds.nuno.id, m);
+        console.error('Firebase written:', obj);
     });
+    console.log('body:', req.body);
+    var m = "Welcome home!";
+    sendMessage(userIds.nuno.id, m);
     res.sendStatus(200);
 });
 
@@ -102,10 +103,11 @@ app.post('/ifttt/work-wifi', function(req, res) {
             res.status(500).send('Firebase error:' + (err || '?'));
             return;
         }
-        console.log('body:', req.body);
-        var m = "Have a nice one!";
-        sendMessage(userIds.nuno.id, m);
+        console.error('Firebase written:', obj);
     });
+    console.log('body:', req.body);
+    var m = "Have a nice one!";
+    sendMessage(userIds.nuno.id, m);
     res.sendStatus(200);
 });
 
