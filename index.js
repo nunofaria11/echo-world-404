@@ -72,16 +72,9 @@ app.post('/webhook/', function(req, res) {
     res.sendStatus(200);
 });
 
-function newFirebaseModel(wifi) {
-    var model = {};
-    var id = wifi.ssid + '-' + Date.now();
-    model[id] = wifi;
-    return model;
-}
-
 app.post('/ifttt/home-wifi', function(req, res) {
-    var obj = newFirebaseModel(req.body);
-    connectsRef.set(obj, function(err) {
+    var obj = req.body;
+    connectsRef.push().set(obj, function(err) {
         if (err) {
             console.error('Firebase error:', err || '?');
             res.status(500).send('Firebase error:' + (err || '?'));
@@ -96,8 +89,8 @@ app.post('/ifttt/home-wifi', function(req, res) {
 });
 
 app.post('/ifttt/work-wifi', function(req, res) {
-    var obj = newFirebaseModel(req.body);
-    connectsRef.set(obj, function(err) {
+    var obj = req.body;
+    connectsRef.push().set(obj, function(err) {
         if (err) {
             console.error('Firebase error:', err || '?');
             res.status(500).send('Firebase error:' + (err || '?'));
